@@ -84,7 +84,7 @@ function addTextSearchOperators(obj, options) {
 
 	var props = obj.properties,
 		anyOf = obj.anyOf;
-
+/*
 	if(options.text !== false) {
 		props['$text'] = { 
 			type: 'object',
@@ -100,7 +100,7 @@ function addTextSearchOperators(obj, options) {
 		};
 
 		anyOf.push({ 'required': ['$text'] });
-	}
+	}*/
 
 	if(options.regex !== false) {
 		props['$regex'] = { type: 'string' };
@@ -271,7 +271,7 @@ function parseMongooseType(schema, type, options) {
 	return json;
 }
 
-function parseMongooseSchema(schema, excludeFn) {
+function parseMongooseSchema(schema, excludeFn, first) {
 	var jsonSchema = parseMongoosePath();
 
 	excludeFn = excludeFn || defaultExcludeFn;
@@ -307,6 +307,24 @@ function parseMongooseSchema(schema, excludeFn) {
 		localJSONSchema.properties[field] = fieldValue;
 	});
 
+	if(first) {
+		var props = jsonSchema.properties;
+		
+		props['$text'] = { 
+			type: 'object',
+			properties: {
+				"$search": {
+					type: "string"
+				},
+				"$language": {
+					enum: lgs
+				} 
+			},
+			required: ['$search']
+		};
+	}
+
+
 	return jsonSchema;
 }
 
@@ -327,7 +345,7 @@ module.exports = function mongooseJSONSchema (schema, options) {
 	options.excludeFn = options.excludeFn || defaultExcludeFn;
 
 	schema.methods.getSearchSchema = function(excludeFn) {
-		return parseMongooseSchema(schema, excludeFn || options.excludeFn);
+		return parseMongooseSchema(schema, excludeFn || options.excludeFn, true);
 	};
 
 	schema.statics.getSearchSchema = schema.methods.getSearchSchema;	
