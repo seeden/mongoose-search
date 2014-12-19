@@ -152,7 +152,7 @@ function parseMongooseSchema(schema, excludeFn, mainSchema, parentSchema) {
 		var isSubdocument = mainSchema !== currentSchema;
 
 		if(isSubdocument) {
-			currentSchema.properties[fieldName] = fieldSchemaStrict;
+			currentSchema.properties[fieldName] = fieldSchema;
 
 			//subdocuments has required all properties
 			currentSchema.required.push(fieldName);
